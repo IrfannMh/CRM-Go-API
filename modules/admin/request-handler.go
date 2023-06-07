@@ -29,11 +29,11 @@ func DefaultRequestHandlerAdmin(db *gorm.DB) *RequestAdminHandler {
 }
 
 type CreateAdminRequest struct {
-	Username string   `json:"username"`
-	Password string   `json:"password"`
-	RoleID   uint     `json:"role_id"`
-	Verified Verified `json:"verified"`
-	Active   Active   `json:"active"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	RoleID   uint   `json:"role_id"`
+	Verified string `json:"verified"`
+	Active   string `json:"active"`
 }
 type UpdateApproveRequest struct {
 	Status string `json:"status"`
@@ -133,13 +133,14 @@ func (h RequestAdminHandler) Login(c *gin.Context) {
 		return
 	}
 	password := admin.Password
+	hashPass := helpers.HashPass(password)
 	username := admin.Username
 	data, err := h.ctrl.FindByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	comparePass := helpers.ComparePass([]byte(data.Password), []byte(password))
+	comparePass := helpers.ComparePass([]byte(data.Password), []byte(hashPass))
 	if !comparePass {
 		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "Password salah"})
 		return

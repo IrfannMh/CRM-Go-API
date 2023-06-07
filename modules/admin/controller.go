@@ -18,10 +18,10 @@ type CreateResponseAdmin struct {
 }
 
 type AdminItemResponse struct {
-	ID       uint     `json:"id"`
-	Username string   `json:"username"`
-	Verified Verified `json:"verified"`
-	Active   Active   `json:"active"`
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+	Verified string `json:"verified"`
+	Active   string `json:"active"`
 }
 
 type ReadAdminApprove struct {
