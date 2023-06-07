@@ -28,7 +28,7 @@ func main() {
 	customerRouter := r.Group("/customers")
 	{
 		customerRouter.POST("/", customerHandler.Create)
-		customerRouter.GET("/", customerHandler.GetAll)
+		customerRouter.GET("/:page", customerHandler.GetAll)
 		customerRouter.DELETE("/:id", customerHandler.Delete)
 	}
 

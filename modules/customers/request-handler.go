@@ -2,6 +2,7 @@ package customers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -60,7 +61,10 @@ func (h RequestHandler) Create(c *gin.Context) {
 }
 
 func (h RequestHandler) GetAll(c *gin.Context) {
-	res, err := h.ctrl.GetAll()
+	pageStr := c.Param("page")
+	pageInt, _ := strconv.Atoi(pageStr)
+	page := (pageInt - 1) * 6
+	res, err := h.ctrl.GetAll(page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return

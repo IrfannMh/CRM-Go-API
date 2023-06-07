@@ -14,8 +14,8 @@ func (u UseCase) Create(customer *Customer) error {
 	return u.repo.Save(customer)
 }
 
-func (u UseCase) GetAll() ([]Customer, error) {
-	return u.repo.GetAllCustomer()
+func (u UseCase) GetAll(page int) ([]Customer, error) {
+	return u.repo.GetAllCustomer(page)
 }
 
 func (u UseCase) Delete(customer *Customer) error {
