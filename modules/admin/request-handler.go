@@ -134,7 +134,6 @@ func (h RequestAdminHandler) Login(c *gin.Context) {
 		return
 	}
 	password := admin.Password
-	hashPass := helpers.HashPass(password)
 	username := admin.Username
 	data, err := h.ctrl.FindByUsername(username)
 
@@ -142,18 +141,15 @@ func (h RequestAdminHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	comparePass := helpers.ComparePass([]byte(data.Password), []byte(hashPass))
+	comparePass := helpers.ComparePass([]byte(data.Password), []byte(password))
 	if !comparePass {
-		c.JSON(http.StatusUnauthorized, gin.H{"inputPass": hashPass, "pass": data.Password})
-		//ErrorResponse{Error: "Password salah"}
+		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "Password salah"})
 		return
 	}
 	//
-	//token := helpers.GenerateToken(data.Id, data.Username)
-	//
-	//c.JSON(http.StatusOK, JWTResponse{Token: token})
+	token := helpers.GenerateToken(data.Id, data.Username)
 
-	c.JSON(http.StatusOK, gin.H{"data": admin.Password})
+	c.JSON(http.StatusOK, JWTResponse{Token: token})
 }
 
 func (h RequestAdminHandler) DeleteAdminByID(c *gin.Context) {
