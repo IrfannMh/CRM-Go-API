@@ -3,7 +3,10 @@ package main
 import (
 	"CRM/modules/admin"
 	"CRM/modules/customers"
+	"fmt"
+	"github.com/joho/godotenv"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -11,7 +14,18 @@ import (
 )
 
 func initDB() (*gorm.DB, error) {
-	dsn := "root:root123@tcp(localhost:3306)/mini_project?parseTime=true"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	host := os.Getenv("MYSQL_HOST")
+	user := os.Getenv("MYSQL_USERNAME")
+	password := os.Getenv("MYSQL_PASSWORD")
+	dbPort := os.Getenv("MYSQL_PORT")
+	dbname := os.Getenv("MYSQL_DBNAME")
+	//dsn := "root:root123@tcp(localhost:3306)/crm?parseTime=true"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, dbPort, dbname)
+
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
@@ -28,7 +42,7 @@ func main() {
 	customerRouter := r.Group("/customers")
 	{
 		customerRouter.POST("/", customerHandler.Create)
-		customerRouter.GET("/:page", customerHandler.GetAll)
+		customerRouter.GET("/", customerHandler.GetAll)
 		customerRouter.DELETE("/:id", customerHandler.Delete)
 	}
 
@@ -41,14 +55,15 @@ func main() {
 		adminRouter.PUT("/approve/:id", adminHandler.ApproveByID)
 		adminRouter.PUT("/active/:id", adminHandler.ActiveAdmin)
 		adminRouter.POST("/login", adminHandler.Login)
+		adminRouter.DELETE("/:id", adminHandler.DeleteAdminByID)
 	}
 
 	// 	create customer
+	// delete customer
 	// create admin
 	// approve admin
 	// get all approve
 	// login admin/superadmin
-	// delete customer
 	// delete admin
 	// update admin
 	// get all admin by username

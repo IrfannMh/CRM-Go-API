@@ -31,9 +31,9 @@ func DefaultRequestHandlerAdmin(db *gorm.DB) *RequestAdminHandler {
 type CreateAdminRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	RoleID   uint   `json:"role_id"`
-	Verified string `json:"verified"`
-	Active   string `json:"active"`
+	//RoleID   uint   `json:"role_id"`
+	//Verified string `json:"verified"`
+	//Active   string `json:"active"`
 }
 type UpdateApproveRequest struct {
 	Status string `json:"status"`
@@ -42,7 +42,8 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 type MessageResponse struct {
-	Message string `json:"message"`
+	Message string           `json:"message"`
+	Data    RegisterApproval `json:"data"`
 }
 
 type JWTResponse struct {
@@ -87,7 +88,7 @@ func (h RequestAdminHandler) GetAdminByUsername(c *gin.Context) {
 
 func (h RequestAdminHandler) ApproveByID(c *gin.Context) {
 	id := c.Param("id")
-	data, err := h.ctrl.FindByID(id)
+	data, err := h.ctrl.FindApprovalID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
@@ -102,12 +103,15 @@ func (h RequestAdminHandler) ApproveByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, MessageResponse{Message: "Update Approval Success"})
+	c.JSON(http.StatusOK, MessageResponse{
+		Message: "Update Approval Success",
+		Data:    *data,
+	})
 }
 
 func (h RequestAdminHandler) ActiveAdmin(c *gin.Context) {
 	id := c.Param("id")
-	data, err := h.ctrl.FindActorByID(id)
+	data, err := h.ctrl.FindAdminByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
@@ -149,4 +153,19 @@ func (h RequestAdminHandler) Login(c *gin.Context) {
 	token := helpers.GenerateToken(data.ID, data.Username)
 
 	c.JSON(http.StatusOK, JWTResponse{Token: token})
+}
+
+func (h RequestAdminHandler) DeleteAdminByID(c *gin.Context) {
+	id := c.Param("id")
+	data, err := h.ctrl.FindAdminByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	if err = h.ctrl.DeleteAdminById(data); err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Admin deleted success"})
 }

@@ -20,11 +20,11 @@ func (u UseCaseAdmin) GetAll() ([]RegisterApproval, error) {
 func (u UseCaseAdmin) FindByUsername(admin *Actors, username string) (Actors, error) {
 	return u.repo.GetAdminByUsername(admin, username)
 }
-func (u UseCaseAdmin) FindByID(approval *RegisterApproval, id string) (RegisterApproval, error) {
-	return u.repo.GetAdminById(approval, id)
+func (u UseCaseAdmin) FindByID(approval *RegisterApproval, id string) error {
+	return u.repo.GetApprovalById(approval, id)
 }
-func (u UseCaseAdmin) FindActorByID(actors *Actors, id string) (Actors, error) {
-	return u.repo.GetActorById(actors, id)
+func (u UseCaseAdmin) FindAdminByID(actors *Actors, id any) error {
+	return u.repo.GetAdminById(actors, id)
 }
 
 func (u UseCaseAdmin) UpdateApprove(approval *RegisterApproval) error {
@@ -33,4 +33,16 @@ func (u UseCaseAdmin) UpdateApprove(approval *RegisterApproval) error {
 
 func (u UseCaseAdmin) UpdatedActive(actor *Actors) error {
 	return u.repo.UpdateActive(actor)
+}
+
+func (u UseCaseAdmin) CreateApproval(approve *RegisterApproval) error {
+	return u.repo.CreateApproval(approve)
+}
+
+func (u UseCaseAdmin) DeleteAdminById(data *Actors) error {
+	return u.repo.DeleteAdminById(data)
+}
+
+func (u UseCaseAdmin) UpdateRole(a *Actors) error {
+	return u.repo.UpdateRole(a)
 }

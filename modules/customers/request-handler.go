@@ -1,11 +1,10 @@
 package customers
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"net/http"
+	"strconv"
 )
 
 type RequestHandler struct {
@@ -61,8 +60,9 @@ func (h RequestHandler) Create(c *gin.Context) {
 }
 
 func (h RequestHandler) GetAll(c *gin.Context) {
-	pageStr := c.Param("page")
-	pageInt, _ := strconv.Atoi(pageStr)
+	//pageStr := c.Param("page")
+	pageParam := c.Query("page")
+	pageInt, _ := strconv.Atoi(pageParam)
 	page := (pageInt - 1) * 6
 	res, err := h.ctrl.GetAll(page)
 	if err != nil {
