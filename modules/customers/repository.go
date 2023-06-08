@@ -14,9 +14,9 @@ func (r Repository) Save(customer *Customer) error {
 	return r.db.Create(customer).Error
 }
 
-func (r Repository) GetAllCustomer(page int) ([]Customer, error) {
+func (r Repository) GetAllCustomer(page int, email string) ([]Customer, error) {
 	var customers []Customer
-	err := r.db.Limit(6).Offset(page).Find(&customers).Error
+	err := r.db.Limit(6).Offset(page).Find(&customers, "email = ?", email).Error
 	return customers, err
 }
 

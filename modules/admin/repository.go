@@ -20,9 +20,10 @@ func (r RepositoryAdmin) GetAllApprove() ([]RegisterApproval, error) {
 	return approvals, err
 }
 
-func (r RepositoryAdmin) GetAdminByUsername(admin *Actors, username string) (Actors, error) {
-	err := r.db.First(&admin, "username = ?", username).Error
-	return *admin, err
+func (r RepositoryAdmin) GetAdminByUsername(username string) (Actors, error) {
+	var admin Actors
+	err := r.db.Find(&admin, "username = ?", username).Error
+	return admin, err
 }
 
 func (r RepositoryAdmin) GetApprovalById(approval *RegisterApproval, id string) error {
@@ -33,9 +34,10 @@ func (r RepositoryAdmin) Update(approve *RegisterApproval) error {
 	return r.db.Save(&approve).Error
 }
 
-func (r RepositoryAdmin) GetAdminById(actors *Actors, id any) error {
-	return r.db.First(&actors, id).Error
-
+func (r RepositoryAdmin) GetAdminById(id any) (Actors, error) {
+	var actor Actors
+	err := r.db.First(&actor, id).Error
+	return actor, err
 }
 
 func (r RepositoryAdmin) UpdateActive(actor *Actors) error {

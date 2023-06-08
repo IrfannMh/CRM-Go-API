@@ -41,6 +41,8 @@ type ErrorResponse struct {
 type MessageResponse struct {
 	Message string `json:"message"`
 }
+type CustomerResponse struct {
+}
 
 func (h RequestHandler) Create(c *gin.Context) {
 	var req CreateRequest
@@ -60,11 +62,12 @@ func (h RequestHandler) Create(c *gin.Context) {
 }
 
 func (h RequestHandler) GetAll(c *gin.Context) {
-	//pageStr := c.Param("page")
+	email := c.Param("email")
 	pageParam := c.Query("page")
 	pageInt, _ := strconv.Atoi(pageParam)
 	page := (pageInt - 1) * 6
-	res, err := h.ctrl.GetAll(page)
+	_ = page
+	res, err := h.ctrl.GetAll(page, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return

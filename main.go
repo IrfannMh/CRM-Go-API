@@ -42,7 +42,7 @@ func main() {
 	customerRouter := r.Group("/customers")
 	{
 		customerRouter.POST("/", customerHandler.Create)
-		customerRouter.GET("/", customerHandler.GetAll)
+		customerRouter.GET("/:email", customerHandler.GetAll)
 		customerRouter.DELETE("/:id", customerHandler.Delete)
 	}
 
@@ -57,16 +57,6 @@ func main() {
 		adminRouter.POST("/login", adminHandler.Login)
 		adminRouter.DELETE("/:id", adminHandler.DeleteAdminByID)
 	}
-
-	// 	create customer
-	// delete customer
-	// create admin
-	// approve admin
-	// get all approve
-	// login admin/superadmin
-	// delete admin
-	// update admin
-	// get all admin by username
 
 	err = r.Run(":8080")
 	if err != nil {

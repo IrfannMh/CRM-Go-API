@@ -51,8 +51,8 @@ func (c ControllerCustomer) Create(req *CreateRequest) (*CreateResponse, error) 
 	return res, nil
 }
 
-func (c ControllerCustomer) GetAll(page int) (*ReadCustomerResponse, error) {
-	customers, err := c.useCase.GetAll(page)
+func (c ControllerCustomer) GetAll(page int, email string) (*ReadCustomerResponse, error) {
+	customers, err := c.useCase.GetAll(page, email)
 	if err != nil {
 		return nil, err
 	}

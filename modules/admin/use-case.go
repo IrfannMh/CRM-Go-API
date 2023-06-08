@@ -17,14 +17,14 @@ func (u UseCaseAdmin) Create(admin *Actors) error {
 func (u UseCaseAdmin) GetAll() ([]RegisterApproval, error) {
 	return u.repo.GetAllApprove()
 }
-func (u UseCaseAdmin) FindByUsername(admin *Actors, username string) (Actors, error) {
-	return u.repo.GetAdminByUsername(admin, username)
+func (u UseCaseAdmin) FindByUsername(username string) (Actors, error) {
+	return u.repo.GetAdminByUsername(username)
 }
 func (u UseCaseAdmin) FindByID(approval *RegisterApproval, id string) error {
 	return u.repo.GetApprovalById(approval, id)
 }
-func (u UseCaseAdmin) FindAdminByID(actors *Actors, id any) error {
-	return u.repo.GetAdminById(actors, id)
+func (u UseCaseAdmin) FindAdminByID(id any) (Actors, error) {
+	return u.repo.GetAdminById(id)
 }
 
 func (u UseCaseAdmin) UpdateApprove(approval *RegisterApproval) error {

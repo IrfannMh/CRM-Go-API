@@ -15,13 +15,24 @@ func NewControllerAdmin(useCase *UseCaseAdmin) *ControllerAdmin {
 }
 
 type CreateResponseAdmin struct {
-	Message string       `json:"message"`
-	Data    ItemResponse `json:"data"`
+	Message string             `json:"message"`
+	Data    ItemResponseCreate `json:"data"`
 }
 
 type ItemResponse struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
+	Id       uint     `json:"id"`
+	Username string   `json:"username"`
+	Password string   `json:"password"`
+	RoleId   uint     `json:"role_id"`
+	Verified Verified `json:"verified"`
+	Active   Active   `json:"active"`
+}
+type ItemResponseCreate struct {
+	Id       uint     `json:"id"`
+	Username string   `json:"username"`
+	RoleId   uint     `json:"role_id"`
+	Verified Verified `json:"verified"`
+	Active   Active   `json:"active"`
 }
 
 type ReadAdminApprove struct {
@@ -36,9 +47,13 @@ type ItemApprove struct {
 
 func (c ControllerAdmin) Create(req *CreateAdminRequest) (*CreateResponseAdmin, error) {
 	hash := helpers.HashPass(req.Password)
+	_ = VerifiedTrue
 	admin := Actors{
 		Username: req.Username,
 		Password: hash,
+		RoleID:   3,
+		Verified: VerifiedFalse,
+		Active:   ActiveFalse,
 	}
 	err := c.useCaseAdmin.Create(&admin)
 	if err != nil {
@@ -46,17 +61,20 @@ func (c ControllerAdmin) Create(req *CreateAdminRequest) (*CreateResponseAdmin, 
 	}
 
 	approve := RegisterApproval{
-		AdminID: admin.ID,
+		AdminID: admin.Id,
 	}
 	err = c.useCaseAdmin.CreateApproval(&approve)
 	if err != nil {
 		return nil, err
 	}
 	res := &CreateResponseAdmin{
-		Message: "Success",
-		Data: ItemResponse{
-			ID:       admin.ID,
+		Message: "Create Admin Success",
+		Data: ItemResponseCreate{
+			Id:       admin.Id,
 			Username: admin.Username,
+			RoleId:   admin.RoleID,
+			Verified: admin.Verified,
+			Active:   admin.Active,
 		},
 	}
 
@@ -72,7 +90,7 @@ func (c ControllerAdmin) GetAllApprove() (*ReadAdminApprove, error) {
 
 	for _, v := range listApprove {
 		item := ItemApprove{
-			ID:      v.ID,
+			ID:      v.Id,
 			AdminID: v.AdminID,
 			Status:  v.Status,
 		}
@@ -81,13 +99,21 @@ func (c ControllerAdmin) GetAllApprove() (*ReadAdminApprove, error) {
 	return result, nil
 }
 
-func (c ControllerAdmin) FindByUsername(username string) (*Actors, error) {
-	var admin Actors
-	_, err := c.useCaseAdmin.FindByUsername(&admin, username)
+func (c ControllerAdmin) FindByUsername(username string) (*ItemResponse, error) {
+
+	data, err := c.useCaseAdmin.FindByUsername(username)
 	if err != nil {
 		return nil, err
 	}
-	return &admin, nil
+	result := &ItemResponse{
+		Id:       data.Id,
+		Username: data.Username,
+		Password: data.Password,
+		RoleId:   data.RoleID,
+		Verified: data.Verified,
+		Active:   data.Active,
+	}
+	return result, nil
 }
 func (c ControllerAdmin) FindApprovalID(id string) (*RegisterApproval, error) {
 	var approval RegisterApproval
@@ -98,23 +124,26 @@ func (c ControllerAdmin) FindApprovalID(id string) (*RegisterApproval, error) {
 	return &approval, nil
 }
 func (c ControllerAdmin) FindAdminByID(id string) (*Actors, error) {
-	var admin Actors
-	if err := c.useCaseAdmin.FindAdminByID(&admin, id); err != nil {
+	//return c.useCaseAdmin.FindAdminByID(admin, id)
+	data, err := c.useCaseAdmin.FindAdminByID(id)
+	if err != nil {
 		return nil, err
 	}
-	return &admin, nil
+
+	return &data, nil
 }
 
 func (c ControllerAdmin) UpdateApprove(req *RegisterApproval) error {
-	var admin Actors
+
 	id := req.AdminID
-	if err := c.useCaseAdmin.UpdateRole(&admin); err != nil {
+	data, err := c.useCaseAdmin.FindAdminByID(id)
+	if err != nil {
 		return err
 	}
-	if err := c.useCaseAdmin.FindAdminByID(&admin, id); err != nil {
+	data.RoleID = 1
+	if err := c.useCaseAdmin.UpdateRole(&data); err != nil {
 		return err
 	}
-	admin.RoleID = 1
 	return c.useCaseAdmin.UpdateApprove(req)
 }
 func (c ControllerAdmin) UpdateActiveAdmin(actor *Actors) error {

@@ -31,9 +31,6 @@ func DefaultRequestHandlerAdmin(db *gorm.DB) *RequestAdminHandler {
 type CreateAdminRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	//RoleID   uint   `json:"role_id"`
-	//Verified string `json:"verified"`
-	//Active   string `json:"active"`
 }
 type UpdateApproveRequest struct {
 	Status string `json:"status"`
@@ -44,6 +41,10 @@ type ErrorResponse struct {
 type MessageResponse struct {
 	Message string           `json:"message"`
 	Data    RegisterApproval `json:"data"`
+}
+type ActiveResponse struct {
+	Message string `json:"message"`
+	Data    Actors `json:"data"`
 }
 
 type JWTResponse struct {
@@ -116,18 +117,14 @@ func (h RequestAdminHandler) ActiveAdmin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-
-	if err := c.BindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
-		return
-	}
+	data.Active = ActiveTrue
 	err = h.ctrl.UpdateActiveAdmin(data)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, MessageResponse{Message: "Active/Deactive Admin Success"})
+	c.JSON(http.StatusOK, ActiveResponse{Message: "Active/Deactive Admin Success", Data: *data})
 }
 
 func (h RequestAdminHandler) Login(c *gin.Context) {
@@ -140,23 +137,28 @@ func (h RequestAdminHandler) Login(c *gin.Context) {
 	hashPass := helpers.HashPass(password)
 	username := admin.Username
 	data, err := h.ctrl.FindByUsername(username)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
 	comparePass := helpers.ComparePass([]byte(data.Password), []byte(hashPass))
 	if !comparePass {
-		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "Password salah"})
+		c.JSON(http.StatusUnauthorized, gin.H{"inputPass": hashPass, "pass": data.Password})
+		//ErrorResponse{Error: "Password salah"}
 		return
 	}
+	//
+	//token := helpers.GenerateToken(data.Id, data.Username)
+	//
+	//c.JSON(http.StatusOK, JWTResponse{Token: token})
 
-	token := helpers.GenerateToken(data.ID, data.Username)
-
-	c.JSON(http.StatusOK, JWTResponse{Token: token})
+	c.JSON(http.StatusOK, gin.H{"data": admin.Password})
 }
 
 func (h RequestAdminHandler) DeleteAdminByID(c *gin.Context) {
 	id := c.Param("id")
+
 	data, err := h.ctrl.FindAdminByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
