@@ -1,8 +1,22 @@
 package customers
 
 type ControllerCustomer struct {
-	useCase *UseCase
+	useCase UseCaseInterface
 }
+
+type ControllerCustomerInterface interface {
+	FindByID(id string) (*Customer, error)
+	Delete(customer *Customer) error
+	GetAll(page int, email string) (*ReadCustomerResponse, error)
+	Create(req *CreateRequest) (*CreateResponse, error)
+}
+
+func NewController(useCase UseCaseInterface) ControllerCustomerInterface {
+	return ControllerCustomer{
+		useCase: useCase,
+	}
+}
+
 type CreateResponse struct {
 	Message string               `json:"message"`
 	Data    CustomerItemResponse `json:"data"`
@@ -17,12 +31,6 @@ type CustomerItemResponse struct {
 
 type ReadCustomerResponse struct {
 	Data []CustomerItemResponse `json:"data"`
-}
-
-func NewController(useCase *UseCase) *ControllerCustomer {
-	return &ControllerCustomer{
-		useCase: useCase,
-	}
 }
 
 func (c ControllerCustomer) Create(req *CreateRequest) (*CreateResponse, error) {

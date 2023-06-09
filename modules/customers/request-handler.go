@@ -8,16 +8,22 @@ import (
 )
 
 type RequestHandler struct {
-	ctrl *ControllerCustomer
+	ctrl ControllerCustomerInterface
 }
 
-func NewRequestHandler(ctrl *ControllerCustomer) *RequestHandler {
+type RequestHandlerInterface interface {
+	Delete(c *gin.Context)
+	GetAll(c *gin.Context)
+	Create(c *gin.Context)
+}
+
+func NewRequestHandler(ctrl ControllerCustomerInterface) RequestHandlerInterface {
 	return &RequestHandler{
 		ctrl: ctrl,
 	}
 }
 
-func DefaultRequestHandler(db *gorm.DB) *RequestHandler {
+func DefaultRequestHandler(db *gorm.DB) RequestHandlerInterface {
 	return NewRequestHandler(
 		NewController(
 			NewUseCase(

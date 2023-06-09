@@ -1,11 +1,18 @@
 package customers
 
 type UseCase struct {
-	repo *Repository
+	repo RepositoryInterface
 }
 
-func NewUseCase(repo *Repository) *UseCase {
-	return &UseCase{
+type UseCaseInterface interface {
+	Create(customer *Customer) error
+	GetAll(page int, email string) ([]Customer, error)
+	Delete(customer *Customer) error
+	FindById(customer *Customer, id string) error
+}
+
+func NewUseCase(repo RepositoryInterface) UseCaseInterface {
+	return UseCase{
 		repo: repo,
 	}
 }

@@ -4,9 +4,10 @@ import (
 	"CRM/modules/admin"
 	"CRM/modules/customers"
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
